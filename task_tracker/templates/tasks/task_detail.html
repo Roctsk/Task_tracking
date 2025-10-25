@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task.title</title>
+</head>
+<body>
+    <h1>{{task.title}}</h1>
+    <p>Опис:{{task.description}}</p>
+    <p>Статус:{{task.get_status_display}}</p>
+    <p>Пріорітет:{{task.get_priority_display}}</p>
+    <p>Термін:{{task.due_date}}</p>
+    <p>Автор:{{task.author.username}}</p>
+    <a href="{% url 'task_list' %}">Повернутися до списку</a>
+</body>
+</html>

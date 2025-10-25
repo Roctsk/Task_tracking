@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мої завдання</title>
+</head>
+<body>
+    <h1>Мої завдання</h1>
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <a href="{% url 'task_detail' task.pk  %}">{{task.title}}</a>
+            <p>Статус:{{task.get_status_display}}</p>
+            <p>Пріорітет:{{task.get_priority_display}}</p>
+        </li>
+        {% empty %}
+            <li>Ще нічого немає</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
