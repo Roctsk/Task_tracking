@@ -12,7 +12,7 @@ class Task(models.Model):
     PRIORRITY_CHOICE = [
         ("low","Низький"),
         ("medium","Середній"),
-        ("higt","Високий"),
+        ("high","Високий"),
     ]
 
     title = models.CharField(max_length=250)

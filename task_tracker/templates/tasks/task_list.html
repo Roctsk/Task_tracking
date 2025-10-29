@@ -1,21 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мої завдання</title>
 </head>
 <body>
     <h1>Мої завдання</h1>
+
     <ul>
         {% for task in tasks %}
-        <li>
-            <a href="{% url 'task_detail' task.pk  %}">{{task.title}}</a>
-            <p>Статус:{{task.get_status_display}}</p>
-            <p>Пріорітет:{{task.get_priority_display}}</p>
+        <li style="margin-bottom: 30px;">
+            <h2>{{ task.title }}</h2>
+            <p>Статус: {{ task.get_status_display }}</p>
+            <p>Пріоритет: {{ task.get_priority_display }}</p>
+            <a href="{% url 'task_detail' task.pk %}">🔍 Деталі</a>
+            <a href="{% url 'task_update' task.pk %}">✏️ Редагувати</a>
+            <a href="{% url 'task_delete' task.pk %}">🗑️ Видалити</a>
+
+            <hr>
+            <h4>Коментарі:</h4>
+            {% for comment in task.comments.all %}
+                <p><strong>{{ comment.author.username }}</strong>: {{ comment.content }}</p>
+            {% empty %}
+                <p>Немає коментарів.</p>
+            {% endfor %}
+
+            {% if user.is_authenticated %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="hidden" name="task_id" value="{{ task.pk }}">
+                <button type="submit">💬 Додати коментар</button>
+            </form>
+            {% else %}
+                <p><a href="{% url 'login' %}">Увійдіть</a>, щоб залишати коментарі.</p>
+            {% endif %}
         </li>
         {% empty %}
-            <li>Ще нічого немає</li>
+            <li>Ще немає завдань</li>
         {% endfor %}
     </ul>
 </body>

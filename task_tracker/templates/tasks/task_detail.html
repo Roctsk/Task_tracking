@@ -12,6 +12,10 @@
     <p>Пріорітет:{{task.get_priority_display}}</p>
     <p>Термін:{{task.due_date}}</p>
     <p>Автор:{{task.author.username}}</p>
-    <a href="{% url 'task_list' %}">Повернутися до списку</a>
+
+    
+    <a href="{% url 'task_update' task.pk %}">✏️ Редагувати</a>
+    <a href="{% url 'task_delete' task.pk %}">🗑️ Видалити</a>
+    <a href="{% url 'task_list' %}">⬅️ Назад до списку</a>
 </body>
 </html>
