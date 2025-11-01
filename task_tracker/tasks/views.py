@@ -1,8 +1,11 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect , get_object_or_404
 from django.views.generic import ListView  ,DetailView, DeleteView, UpdateView
-from .models import Task
+from .models import Task , Comment, CommentLike
 from django.urls import reverse_lazy
 from .forms import CommentForm
+from django.db.models import Count
+
+from django.contrib.auth.decorators import login_required
 
 
 class TaskListViews(ListView):
@@ -12,8 +15,15 @@ class TaskListViews(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["forms"] = CommentForm()
+
+        context["form"] = CommentForm()
+
+        context["comments"] = Comment.objects.annotate(
+            like_count=Count("likes")
+        ).order_by("-like_count", "-create_at")
+
         return context
+
     
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -32,6 +42,24 @@ class TaskListViews(ListView):
             comment.author = request.user
             comment.save()
         return redirect("task_list")
+
+
+@login_required
+def like_comment(request,comment_id):
+    comment = get_object_or_404(Comment, id = comment_id)
+
+    like,created = CommentLike.objects.get_or_create(
+        comment = comment,
+        user = request.user
+    )
+
+    if not created:
+        like.delete()
+
+    return redirect("task_list")
+
+
+
 
 
 class TaskDetailView(DetailView):

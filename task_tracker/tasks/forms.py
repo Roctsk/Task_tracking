@@ -11,6 +11,6 @@ class CommentForm(forms.ModelForm):
                 "placeholder":"Напишіть коментар..."
             })
         }
-        lables = {
+        labels = {
             "content": ""
         }

@@ -42,3 +42,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Коментар від {self.author.username} до {self.task.title}"
+    
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment,on_delete=models.CASCADE,related_name="likes")
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("comment" ,"user")
