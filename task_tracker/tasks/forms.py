@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment
+from .models import Comment , Task
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -14,3 +14,9 @@ class CommentForm(forms.ModelForm):
         labels = {
             "content": ""
         }
+
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ["title","description","status","priority","due_date"]
