@@ -5,8 +5,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CommentForm ,TaskForm
 from django.db.models import Count
-
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from .mixins import UserIsOwnerMixin
 
 
@@ -46,7 +48,6 @@ class TaskListViews(ListView):
         return redirect("task_list")
 
 
-@login_required
 def like_comment(request,comment_id):
     comment = get_object_or_404(Comment, id = comment_id)
 
@@ -97,4 +98,22 @@ class TaskCreateView(LoginRequiredMixin,CreateView):
     
 
 
+
+class CustomLoginView(LoginView):
+    template_name = "tasks/login.html"
+    redirect_authenticated_user = True
+
+
+class CustomLogoutView(LogoutView):
+    next_page = "login"
+
+
+class RegisterView(CreateView):
+    template_name = "tasks/register.html"
+    form_class = UserCreationForm
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect(reverse_lazy("task_list"))
 

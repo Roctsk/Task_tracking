@@ -6,6 +6,46 @@
     <title>Редагування завдання</title>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3 mb-4">
+        <div class="container">
+          <a class="navbar-brand fw-bold fs-4" href="{% url 'task_list' %}">🚀 TaskManager</a>
+      
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+      
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+              {% if user.is_authenticated %}
+                <li class="nav-item me-3">
+                  <span class="nav-link text-white fs-6">👤 {{ user.username }}</span>
+                </li>
+                <li class="nav-item">
+                  <form action="{% url 'logout' %}" method="post" class="m-0 p-0">
+                    {% csrf_token %}
+                    <button 
+                      type="submit" 
+                      class="btn btn-outline-light btn-sm px-3 py-1 fw-semibold"
+                      style="border-radius: 20px;">
+                      🚪 Вийти
+                    </button>
+                  </form>
+                </li>
+              {% else %}
+                <li class="nav-item me-2">
+                  <a class="nav-link fs-6" href="{% url 'login' %}">🔑 Увійти</a>
+                </li>
+                <li class="nav-item">
+                  <a class="btn btn-light btn-sm fw-semibold px-3 py-1" href="{% url 'register' %}" style="border-radius: 20px;">
+                    📝 Реєстрація
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </nav>
+      
     <h1>Редагування завдання {{task.title}}</h1>
     <form method="post">
         {% csrf_token %}

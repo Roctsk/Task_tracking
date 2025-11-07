@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <title>Реєстрація</title>
+  <style>
+    .auth-card {
+      width: 400px;
+      background-color: #fff;
+      border: 2px solid #198754;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .auth-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="auth-card">
+      <h3 class="text-center mb-4 text-success fw-bold">Створити акаунт</h3>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          {{ form.username.label_tag }}
+          {{ form.username }}
+        </div>
+        <div class="mb-3">
+          {{ form.password1.label_tag }}
+          {{ form.password1 }}
+        </div>
+        <div class="mb-3">
+          {{ form.password2.label_tag }}
+          {{ form.password2 }}
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">
+          Зареєструватися
+        </button>
+      </form>
+
+      <div class="text-center mt-3">
+        <small>
+          Вже маєш акаунт?
+          <a href="{% url 'login' %}" class="text-decoration-none text-success fw-semibold">
+            Увійти
+          </a>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

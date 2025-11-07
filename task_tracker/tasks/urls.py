@@ -1,5 +1,6 @@
 from django.urls import path 
 from .views import TaskListViews,TaskDetailView , TaskDeleteView, TaskUpdateView , like_comment,TaskCreateView
+from tasks import views
 
 
 urlpatterns = [
@@ -9,4 +10,7 @@ urlpatterns = [
     path('<int:pk>/delete/',TaskDeleteView.as_view(),name="task_delete"),
     path('create/',TaskCreateView.as_view(),name="task_create"),
     path("like/<int:comment_id>/",like_comment, name="like_comment"),
+    path("login/", views.CustomLoginView.as_view(), name="login"),
+    path("logout/", views.CustomLogoutView.as_view(), name="logout"),
+    path("register/", views.RegisterView.as_view(), name="register"),
 ]
