@@ -10,7 +10,9 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .mixins import UserIsOwnerMixin
-
+from tasks import models
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import User
 
 class TaskListViews(ListView):
     model = Task
@@ -47,7 +49,7 @@ class TaskListViews(ListView):
             comment.save()
         return redirect("task_list")
 
-
+@login_required
 def like_comment(request,comment_id):
     comment = get_object_or_404(Comment, id = comment_id)
 
@@ -60,6 +62,33 @@ def like_comment(request,comment_id):
         like.delete()
 
     return redirect("task_list")
+
+
+class CommentUpdateView(LoginRequiredMixin,UserIsOwnerMixin, UpdateView):
+    model = models.Comment
+    fields = ['content']
+    template_name = 'tasks/edit_comment.html'
+
+    def form_valid(self, form):
+        comment = self.get_object()
+        if comment.author != self.request.user:
+            raise PermissionDenied("Ви не можете редагувати цей коментар.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
+
+
+class CommentDeleteView(LoginRequiredMixin,UserIsOwnerMixin, DeleteView):
+    model = models.Comment
+    template_name = 'tasks/delete_comment.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(author=self.request.user)
+
+    def get_success_url(self):
+        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
 
 
 
@@ -116,4 +145,10 @@ class RegisterView(CreateView):
         user = form.save()
         login(self.request, user)
         return redirect(reverse_lazy("task_list"))
+    
+
+
+def profile_view(request,username):
+    user = get_object_or_404(User,username=username)
+    return redirect(request , 'profile.html',{'profile.html':user})
 
