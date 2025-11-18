@@ -5,16 +5,26 @@ from .models import Task, Comment
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['content']
+        fields = ['content','media']
         widgets = {
             "content":forms.TextInput(attrs={
                 "class":"form-control",
                 "placeholder":"Напишіть коментар..."
             })
         }
+        {
+            'media':forms.FileInput()
+        }
         labels = {
             "content": ""
         }
+
+
+
+class CommentEditForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content", "media"]
 
 
 class TaskForm(forms.ModelForm):

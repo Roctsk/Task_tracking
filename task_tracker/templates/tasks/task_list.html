@@ -16,60 +16,40 @@
     .task-card:hover {
       transform: translateY(-3px);
     }
-    .comment-box {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 1rem;
-      margin-top: 1rem;
-    }
-    .comment {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .comment:last-child {
-      border-bottom: none;
-    }
   </style>
 </head>
 <body>
-
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3 mb-4">
     <div class="container">
       <a class="navbar-brand fw-bold fs-4" href="{% url 'task_list' %}">🚀 TaskManager</a>
-  
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-  
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
           {% if user.is_authenticated %}
             <li class="nav-item me-3">
-              <a href="{% url 'task_create' %}"class="nav-link text-white fs-6" style="border-radius: 20px;">
-                ➕ Створити завдання
-              </a>
+              <a href="{% url 'task_create' %}" class="nav-link text-white fs-6">➕ Створити завдання</a>
             </li>
             <li class="nav-item">
               <form action="{% url 'logout' %}" method="post" class="m-0 p-0">
                 {% csrf_token %}
-                <button 
-                  type="submit" 
-                  class="btn btn-outline-light btn-sm px-3 py-1 fw-semibold"
-                  style="border-radius: 20px;">
+                <button type="submit" class="btn btn-outline-light btn-sm px-3 py-1 fw-semibold">
                   🚪 Вийти
                 </button>
               </form>
             </li>
-            <li class="nav-item me-3">
-              <a href="{% url 'profile' user.username %}" class="btn btn-light btn-sm fw-semibold px-3 py-1" style="border-radius: 20px;margin-left: 10px;">👤 {{ user.username }}</a>
+            <li class="nav-item ms-3">
+              <a href="{% url 'profile' user.username %}" class="btn btn-light btn-sm fw-semibold px-3 py-1">👤 {{ user.username }}</a>
             </li>
           {% else %}
             <li class="nav-item me-2">
               <a class="nav-link fs-6" href="{% url 'login' %}">🔑 Увійти</a>
             </li>
             <li class="nav-item">
-              <a class="btn btn-light btn-sm fw-semibold px-3 py-1" href="{% url 'register' %}" style="border-radius: 20px;">
+              <a class="btn btn-light btn-sm fw-semibold px-3 py-1" href="{% url 'register' %}">
                 📝 Реєстрація
               </a>
             </li>
@@ -78,7 +58,7 @@
       </div>
     </div>
   </nav>
-  
+
   <div class="container">
     <h2 class="text-center text-primary mb-4">Мої завдання</h2>
 
@@ -88,87 +68,118 @@
           <div class="col-md-6 col-lg-4">
             <div class="card task-card border-0">
               <div class="card-body">
-                <h5 class="card-title fw-bold text-primary">{{ task.title }}</h5>
-                <p class="mb-1"><strong>Статус:</strong> {{ task.get_status_display }}</p>
-                <p class="mb-1"><strong>Пріоритет:</strong> {{ task.get_priority_display }}</p>
-                <p class="text-muted small mb-3">До: {{ task.due_date|date:"d.m.Y" }}</p>
 
-                <div class="d-flex justify-content-between">
+                <h5 class="card-title fw-bold text-primary">{{ task.title }}</h5>
+                <p class="mb-1">
+                  <strong>Статус:</strong>
+                  <span class="badge rounded-pill 
+                    {% if task.status == 'do' %} text-bg-info 
+                    {% elif task.status == 'in_progress' %} text-bg-warning 
+                    {% elif task.status == 'completed' %} text-bg-success 
+                    {% else %} text-bg-secondary 
+                    {% endif %}">
+                    {{ task.get_status_display }}
+                  </span>
+                </p>
+                <p class="mb-1">
+                  <strong>Пріоритет:</strong>
+                  <span class="badge rounded-pill 
+                    {% if task.priority == 'low' %} text-bg-success 
+                    {% elif task.priority == 'medium' %} text-bg-warning 
+                    {% elif task.priority == 'high' %} text-bg-danger 
+                    {% else %} text-bg-secondary 
+                    {% endif %}">
+                    {{ task.get_priority_display }}
+                  </span>
+                </p>
+                <p class="text-muted small">До: {{ task.due_date|date:"d.m.Y" }}</p>
+
+                <div class="d-flex justify-content-between mb-3">
                   <a href="{% url 'task_detail' task.pk %}" class="btn btn-outline-primary btn-sm">🔍 Деталі</a>
                   <a href="{% url 'task_update' task.pk %}" class="btn btn-outline-secondary btn-sm">✏️ Редагувати</a>
                   <a href="{% url 'task_delete' task.pk %}" class="btn btn-outline-danger btn-sm">🗑️ Видалити</a>
                 </div>
 
-                <section>
-                  <div class="container my-5 py-5">
-                    <div class="row d-flex justify-content-center">
-                      <div class="col-md-12 col-lg-10">
-                        <div class="card text-body">
-                          <div class="card-body p-4">
-                            <p class="fw-light mb-4 pb-2">Коментарі</p>
-                            {% for comment in task.comments.all %}
-                
-                            <div class="d-flex flex-start">
-                              <img class="rounded-circle shadow-1-strong me-3"
-                                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="avatar" width="60"
-                                height="60" />
-                              <div>
-                                <h6 class="fw-bold mb-1">{{ comment.author.username }}</h6>
-                                <div class="d-flex align-items-center mb-3">
-                                  <p class="mb-0">
-                                    {{ comment.create_at }}
-                                  </p>
-                                  <a href="#!" class="link-muted"><i class="fas fa-pencil-alt ms-2"></i></a>
-                                  <a href="#!" class="link-muted"><i class="fas fa-redo-alt ms-2"></i></a>
-                                  <a href="#!" class="link-muted"><i class="fas fa-heart ms-2"></i></a>
-                                  <span>{{ comment.content }}</span>
-                                  <form action="{% url 'like_comment' comment.pk %}" method="post" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-2">
-                                      ❤️ {{ comment.likes.count }}
-                                    </button>
-                                  </form>
-                                  {% empty %}
-                                  <p class="text-muted small">Немає коментарів.</p>
-                                {% endfor %}
+                <p class="fw-light mb-2">Коментарі</p>
+                  
 
-                            
-                                {% if user.is_authenticated %}
-                            
-                                  <form method="post" class="mt-2">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-                                      {{ form.content }}
-                                      <input type="hidden" name="task_id" value="{{ task.pk }}">
+                {% if task.comments.all %}
+                    {% for comment in task.comments.all %}
+                        <div class="d-flex flex-start mb-3">
+                            <img class="rounded-circle shadow-1-strong me-3"
+                                 src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp"
+                                 width="50" height="50">
+                
+                            <div>
+                
+                                <h6 class="fw-bold mb-1">{{ comment.author.username }}</h6>
+                                <p class="mb-1">{{ comment.content }}</p>
+                
+                                {% load custom_tags %}
+                
+                                {% if comment.media %}
+                                    <div class="comment-media mt-2">
+                                        {% if comment.media.url|endswith:".jpg" or comment.media.url|endswith:".jpeg" or comment.media.url|endswith:".png" %}
+                                            <img src="{{ comment.media.url }}" alt="Фото" style="max-width: 100%; border-radius: 8px;">
+                                        {% elif comment.media.url|endswith:".mp4" %}
+                                            <video width="320" height="240" controls>
+                                                <source src="{{ comment.media.url }}" type="video/mp4">
+                                            </video>
+                                        {% else %}
+                                            <a href="{{ comment.media.url }}">Завантажити файл</a>
+                                        {% endif %}
                                     </div>
-                            
-                                    <button type="submit" class="btn btn-sm btn-primary mt-2">💬 Додати коментар</button>
-                            
-                                  </form>                            
-                            
-                                {% else %}
-                                  <p class="text-muted mt-2">
-                                    <a href="{% url 'login' %}" class="text-decoration-none">Увійдіть</a>, щоб залишати коментарі.
-                                  </p>
                                 {% endif %}
-                              </div>
-                                </div>
-                              </div>
+                
+                                <form action="{% url 'like_comment' comment.pk %}" method="post" class="d-inline mt-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        ❤️ {{ comment.likes.count }}
+                                    </button>
+                                </form>\
+                                {% if comment.author == user %}
+                                <a href="{% url 'edit_comment' comment.pk %}" class="btn btn-sm btn-outline-secondary p-1" title="Редагувати">
+                                    ✏️
+                                </a>
+                    
+                                <form action="{% url 'delete_comment' comment.pk %}" method="post" class="m-0 p-0">
+                                    {% csrf_token %}
+                                    <a href="{% url 'delete_comment' comment.pk %}" class="btn btn-sm btn-outline-secondary p-1" title="Видалити">
+                                      🗑️
+                                   </a>
+                                </form>
+                                {% endif %}
                             </div>
-                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted small">Немає коментарів.</p>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <form method="post" enctype="multipart/form-data" class="mt-2">
+                        {% csrf_token %}
+                        {{ form.content }}
+                        <input type="file" name="media" class="form-control mt-2">
+                        <input type="hidden" name="task_id" value="{{ task.pk }}">
+                        <button type="submit" class="btn btn-sm btn-primary mt-2">💬 Додати коментар</button>
+                    </form>
+                {% else %}
+                    <p class="text-muted mt-2">
+                        <a href="{% url 'login' %}" class="text-decoration-none">Увійдіть</a>, щоб залишати коментарі.
+                    </p>
+                {% endif %}
+                
+
+              </div>
+            </div>
+          </div>
         {% endfor %}
       </div>
+
     {% else %}
       <div class="alert alert-info text-center">Поки що немає завдань</div>
     {% endif %}
   </div>
-
-
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -35,7 +35,7 @@ class TaskListViews(ListView):
         if not request.user.is_authenticated:
             return redirect("login")
 
-        form = CommentForm(request.POST)
+        form = CommentForm(request.POST, request.FILES)
         if form.is_valid():
             task_id = request.POST.get("task_id")
             try:
@@ -62,36 +62,6 @@ def like_comment(request,comment_id):
         like.delete()
 
     return redirect("task_list")
-
-
-class CommentUpdateView(LoginRequiredMixin,UserIsOwnerMixin, UpdateView):
-    model = models.Comment
-    fields = ['content']
-    template_name = 'tasks/edit_comment.html'
-
-    def form_valid(self, form):
-        comment = self.get_object()
-        if comment.author != self.request.user:
-            raise PermissionDenied("Ви не можете редагувати цей коментар.")
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
-
-
-class CommentDeleteView(LoginRequiredMixin,UserIsOwnerMixin, DeleteView):
-    model = models.Comment
-    template_name = 'tasks/delete_comment.html'
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(author=self.request.user)
-
-    def get_success_url(self):
-        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
-
-
-
 
 
 class TaskDetailView(DetailView):
@@ -147,8 +117,47 @@ class RegisterView(CreateView):
         return redirect(reverse_lazy("task_list"))
     
 
+class CommentUpdateView(LoginRequiredMixin,UserIsOwnerMixin, UpdateView):
+    model = models.Comment
+    fields = ['content']
+    template_name = 'tasks/edit_comment.html'
+
+    def form_valid(self, form):
+        comment = self.get_object()
+        if comment.author != self.request.user:
+            raise PermissionDenied("Ви не можете редагувати цей коментар.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
+
+
+class CommentDeleteView(LoginRequiredMixin,UserIsOwnerMixin, DeleteView):
+    model = models.Comment
+    template_name = 'tasks/delete_comment.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(author=self.request.user)
+
+    def get_success_url(self):
+        return reverse_lazy('task_detail', kwargs={'pk': self.object.task.pk})
+
+
+
+
 
 def profile_view(request,username):
-    user = get_object_or_404(User,username=username)
-    return redirect(request , 'profile.html',{'profile.html':user})
+    user_profile  = get_object_or_404(User,username=username)
+    return render(request , 'profile.html',{'user_profile':user_profile})
+
+
+
+
+
+
+
+
+
+
 

@@ -35,7 +35,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     content = models.CharField(max_length=250)
     create_at = models.DateTimeField(auto_now_add=True)
-
+    media = models.FileField(upload_to="comment_media",blank=True,null=True)
 
     class Meta:
         ordering = ["create_at"]
