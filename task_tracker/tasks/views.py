@@ -13,6 +13,9 @@ from .mixins import UserIsOwnerMixin
 from tasks import models
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
+from .forms import UserProfileForm ,UserForm
+from .models import UserProfile
+from django.contrib import messages
 
 class TaskListViews(ListView):
     model = Task
@@ -149,15 +152,39 @@ class CommentDeleteView(LoginRequiredMixin,UserIsOwnerMixin, DeleteView):
 
 def profile_view(request,username):
     user_profile  = get_object_or_404(User,username=username)
-    return render(request , 'profile.html',{'user_profile':user_profile})
+    tasks = Task.objects.filter(author=user_profile)
+    comments = Comment.objects.filter(author=user_profile).order_by('-create_at')
+    likes = CommentLike.objects.filter(user=user_profile)
+
+    context = {
+        "user_profile":user_profile,
+        "tasks":tasks,
+        "comments":comments,
+        "likes":likes,
+        "username": username
+    }
+
+    return render(request , 'profile.html',context)
 
 
+def edit_profile(request, username):
+    user_profile = get_object_or_404(UserProfile, user__username=username)
 
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Профіль успішно оновлено!")
+            return redirect('profile', username=user_profile.user.username) 
+        else:
+            messages.error(request, "Будь ласка, виправте помилки у формі.")
+            print(user_form.errors)
+            print(profile_form.errors)
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=user_profile)
 
-
-
-
-
-
-
+    return render(request, "edit_profile.html", {'user_form': user_form, 'profile_form': profile_form, 'user_profile': user_profile})

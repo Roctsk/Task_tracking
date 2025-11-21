@@ -1,7 +1,8 @@
 from django.urls import path 
-from .views import TaskListViews,TaskDetailView , TaskDeleteView, TaskUpdateView , like_comment,TaskCreateView , profile_view 
+from .views import TaskListViews,TaskDetailView , TaskDeleteView, TaskUpdateView , like_comment,TaskCreateView , profile_view , edit_profile 
 from tasks import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('',TaskListViews.as_view(),name="task_list"),
@@ -16,4 +17,9 @@ urlpatterns = [
     path('comment/edit/<int:pk>/', views.CommentUpdateView.as_view(), name='edit_comment'),
     path('comment/delete/<int:pk>/', views.CommentDeleteView.as_view(), name='delete_comment'),
     path('profile/<str:username>/',profile_view , name='profile'),
+    path('profile/<str:username>/edit/', edit_profile, name='edit_profile'),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -105,52 +105,53 @@
 
                 {% if task.comments.all %}
                     {% for comment in task.comments.all %}
-                        <div class="d-flex flex-start mb-3">
-                            <img class="rounded-circle shadow-1-strong me-3"
-                                 src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp"
-                                 width="50" height="50">
-                
-                            <div>
-                
-                                <h6 class="fw-bold mb-1">{{ comment.author.username }}</h6>
-                                <p class="mb-1">{{ comment.content }}</p>
-                
-                                {% load custom_tags %}
-                
-                                {% if comment.media %}
-                                    <div class="comment-media mt-2">
-                                        {% if comment.media.url|endswith:".jpg" or comment.media.url|endswith:".jpeg" or comment.media.url|endswith:".png" %}
-                                            <img src="{{ comment.media.url }}" alt="Фото" style="max-width: 100%; border-radius: 8px;">
-                                        {% elif comment.media.url|endswith:".mp4" %}
-                                            <video width="320" height="240" controls>
-                                                <source src="{{ comment.media.url }}" type="video/mp4">
-                                            </video>
-                                        {% else %}
-                                            <a href="{{ comment.media.url }}">Завантажити файл</a>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                
-                                <form action="{% url 'like_comment' comment.pk %}" method="post" class="d-inline mt-2">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        ❤️ {{ comment.likes.count }}
-                                    </button>
-                                </form>\
-                                {% if comment.author == user %}
-                                <a href="{% url 'edit_comment' comment.pk %}" class="btn btn-sm btn-outline-secondary p-1" title="Редагувати">
-                                    ✏️
-                                </a>
+                    <div class="d-flex flex-start mb-3">
+                      <img class="rounded-circle shadow-1-strong me-3"
+                           src="{{ comment.author.userprofile.avatar.url }}" 
+                           width="50" height="50" alt="Аватар користувача">
                     
-                                <form action="{% url 'delete_comment' comment.pk %}" method="post" class="m-0 p-0">
-                                    {% csrf_token %}
-                                    <a href="{% url 'delete_comment' comment.pk %}" class="btn btn-sm btn-outline-secondary p-1" title="Видалити">
-                                      🗑️
-                                   </a>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </div>
+                      <div>
+                          <h6 class="fw-bold mb-1">{{ comment.author.username }}</h6>
+                          <p class="mb-1">{{ comment.content }}</p>
+                  
+                          {% load custom_tags %}
+                  
+                          {% if comment.media %}
+                              <div class="comment-media mt-2">
+                                  {% if comment.media.url|endswith:".jpg" or comment.media.url|endswith:".jpeg" or comment.media.url|endswith:".png" %}
+                                      <img src="{{ comment.media.url }}" alt="Фото" style="max-width: 100%; border-radius: 8px;">
+                                  {% elif comment.media.url|endswith:".mp4" %}
+                                      <video width="320" height="240" controls>
+                                          <source src="{{ comment.media.url }}" type="video/mp4">
+                                      </video>
+                                  {% else %}
+                                      <a href="{{ comment.media.url }}" class="btn btn-outline-primary btn-sm">Завантажити файл</a>
+                                  {% endif %}
+                              </div>
+                          {% endif %}
+                  
+                          <form action="{% url 'like_comment' comment.pk %}" method="post" class="d-inline mt-2">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center">
+                                  ❤️ {{ comment.likes.count }} 
+                              </button>
+                          </form>
+                  
+                          {% if comment.author == user %}
+                              <a href="{% url 'edit_comment' comment.pk %}" class="btn btn-outline-secondary btn-sm p-1" title="Редагувати">
+                                  ✏️
+                              </a>
+  
+                              <form action="{% url 'delete_comment' comment.pk %}" method="post" class="m-0 p-0 d-inline">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-outline-danger btn-sm p-1" title="Видалити">
+                                      🗑️ 
+                                  </button>
+                              </form>
+                          {% endif %}
+                      </div>
+                  </div>
+                  
                     {% endfor %}
                 {% else %}
                     <p class="text-muted small">Немає коментарів.</p>

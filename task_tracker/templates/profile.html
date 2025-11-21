@@ -85,15 +85,15 @@
 <body>
   <div class="profile-card">
 
-    <!-- Аватар та ім'я -->
     <div class="avatar-wrapper mb-3">
-      <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="Аватар користувача">
+      <img src="{{ userprofile.avatar.url}}" alt="Аватар користувача">
       <button class="change-avatar-btn" title="Змінити аватар">✏️</button>
-    </div>
-    <h3 class="fw-bold text-primary text-center mb-1">{{ user_profile.username }}</h3>
-    <p class="text-muted text-center mb-4">Місце для короткої біографії користувача</p>
+  </div>
+  
 
-    <!-- Статистика користувача -->
+    <h3 class="fw-bold text-primary text-center mb-1">{{ user_profile.username }}</h3>
+    <p class="text-muted text-center mb-4">{{ user_profile.bio }}</p>
+
     <div class="row text-center mb-4">
       <div class="col-4">
         <div class="stats-card">
@@ -115,28 +115,54 @@
       </div>
     </div>
 
-    <!-- Кнопки швидких дій -->
     <div class="text-center mb-4 action-btns">
       <a href="{% url 'task_create' %}" class="btn btn-outline-primary btn-sm">➕ Створити завдання</a>
       <a href="{% url 'task_list' %}" class="btn btn-outline-secondary btn-sm">📋 Мої завдання</a>
-      <a href="#" class="btn btn-outline-success btn-sm">⚙️ Редагувати профіль</a>
+      <a href="{% url 'edit_profile' username=user_profile.username %}" class="btn btn-outline-success btn-sm">⚙️ Редагувати профіль</a>
     </div>
 
-    <!-- Останні коментарі -->
     <h5 class="fw-bold text-primary mb-3">Останні коментарі</h5>
+
     {% if comments %}
-      {% for comment in comments %}
-        <div class="comment-card">
-          <span class="comment-author">{{ comment.task.title }}</span>:
-          <p>{{ comment.content }}</p>
-          <small class="text-muted">Опубліковано {{ comment.created_at|date:"d.m.Y H:i" }}</small>
+        <div id="comment-list">
+            {% for comment in comments %}
+                <div class="comment-card" {% if forloop.counter > 2 %}class="d-none" {% endif %}>
+                    <span class="comment-author">{{ comment.author.username }}</span>:
+                    <p>{{ comment.content }}</p>
+                    <small class="text-muted">Опубліковано {{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+            {% endfor %}
         </div>
-      {% endfor %}
+    
+        <button id="show-more-comments" class="btn btn-outline-primary btn-sm mt-3" onclick="toggleComments()">Показати більше</button>
     {% else %}
-      <p class="text-muted text-center">Користувач ще не залишав коментарів</p>
+        <p class="text-muted text-center">Користувач ще не залишав коментарів</p>
     {% endif %}
+    
 
   </div>
+  <script>
+    function toggleComments() {
+        var comments = document.querySelectorAll('#comment-list .comment-card');
+        var showMoreButton = document.getElementById('show-more-comments');
+
+        var hiddenComments = document.querySelectorAll('#comment-list .comment-card.d-none');
+
+        if (hiddenComments.length > 0) {
+            hiddenComments.forEach(function(comment) {
+                comment.classList.remove('d-none');
+            });
+            showMoreButton.textContent = 'Показати менше';
+        } else {
+            comments.forEach(function(comment, index) {
+                if (index > 1) {
+                    comment.classList.add('d-none');
+                }
+            });
+            showMoreButton.textContent = 'Показати більше';
+        }
+    }
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
