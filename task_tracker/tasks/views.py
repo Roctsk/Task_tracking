@@ -151,10 +151,10 @@ class CommentDeleteView(LoginRequiredMixin,UserIsOwnerMixin, DeleteView):
 
 
 def profile_view(request,username):
-    user_profile  = get_object_or_404(User,username=username)
-    tasks = Task.objects.filter(author=user_profile)
-    comments = Comment.objects.filter(author=user_profile).order_by('-create_at')
-    likes = CommentLike.objects.filter(user=user_profile)
+    user_profile  = get_object_or_404(UserProfile,user__username=username)
+    tasks = Task.objects.filter(author=user_profile.user)
+    comments = Comment.objects.filter(author=user_profile.user).order_by('-create_at')
+    likes = CommentLike.objects.filter(user=user_profile.user)
 
     context = {
         "user_profile":user_profile,
